@@ -36,6 +36,14 @@ public class PlayerInventory : MonoBehaviour
         // Ideally loop through enumsbut fuck it.
     }
 
+    public bool HasItem(RequiredItem.KeyItemType keyItemType)
+    {
+        return acquiredItems.Find((RequiredItem keyItem) =>
+        {
+            return keyItem.type.Equals(keyItemType);
+        });
+    }
+
     public bool HasKey()
     {
         return acquiredItems.Find((RequiredItem keyItem) =>
