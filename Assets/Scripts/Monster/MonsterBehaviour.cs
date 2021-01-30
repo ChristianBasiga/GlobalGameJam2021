@@ -98,7 +98,6 @@ public class MonsterBehaviour : MonoBehaviour
         Quaternion lookRoation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRoation, Time.deltaTime * facingSpeed);
         nextTargetPosition = direction * Time.deltaTime * speed;
-        // AI will be hardest part honestly, get rest of game then get monster well.
     }
 
     void LookForLight()
@@ -116,11 +115,6 @@ public class MonsterBehaviour : MonoBehaviour
     void KeepInVicinityOfPlayer()
     {
         // Sets next target position. Choose random position within distance of player.
-
-    }
-
-    void CalculateNextPosition()
-    {
 
     }
     

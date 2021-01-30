@@ -32,7 +32,6 @@ public class ItemSuck : MonoBehaviour
 
     IEnumerator SuckItem(RequiredItem item)
     {
-        
         while ((item.transform.position - SuckTransformTarget.position).magnitude > MinDistanceForSuck )
         {
             item.transform.position = Vector3.MoveTowards(item.transform.position, SuckTransformTarget.position, Time.deltaTime * ItemSuckSpeed);

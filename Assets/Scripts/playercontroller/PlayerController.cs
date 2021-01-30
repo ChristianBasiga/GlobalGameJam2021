@@ -23,14 +23,22 @@ public class PlayerController : MonoBehaviour
     Vector2 currentMouseDelta = Vector2.zero;
     Vector2 currentMouseDeltaVelocity = Vector2.zero;
 
+    public MonsterLineOfSight monsterLineOfSight;
+    public PlayerInventory playerInventory;
+
+    public event System.Action OnPlayerCaught;
+    public event System.Action OnPlayerLookUpOrDown;
+
     void Start()
     {
+        playerInventory = GetComponent<PlayerInventory>();
         controller = GetComponent<CharacterController>();
         if (lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
+
     }
 
     void Update()
@@ -67,6 +75,25 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = (transform.forward * currentDir.y + transform.right * currentDir.x) * walkSpeed + Vector3.up * velocityY;
 
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
 
     }
-}
+
+    private void OnTriggerEnter(Collider other)
+    {
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Monster"))
+        {
+            Debug.Log("Player caught");
+            OnPlayerCaught?.Invoke();
+            hit.gameObject.SetActive(false);
+        }
+    }
+
+}   

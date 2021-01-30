@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-
+    public event System.Action OnOpenDoor;
 
 
     // Start is called before the first frame update
@@ -23,16 +23,22 @@ public class Door : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
 
-        PlayerInventory playerInventory = other.GetComponent<PlayerInventory>();
-        if (playerInventory.HasKey())
+        if (other.TryGetComponent(out PlayerInventory playerInventory))
         {
-            // Open door.
-            OpenDoor();
+            if (playerInventory.HasAllItems())
+            {
+                // Open door.
+                OpenDoor();
+            } else
+            {
+
+            }
         }
     }
 
     private void OpenDoor()
     {
         Debug.Log("Open Door");
+        OnOpenDoor?.Invoke();
     }
 }

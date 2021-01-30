@@ -14,6 +14,8 @@ public class RequiredItem : MonoBehaviour
     [SerializeField]
     public KeyItemType type;
 
+    public string PickUpMessage;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +27,4 @@ public class RequiredItem : MonoBehaviour
     {
         
     }
-
- 
-
 }

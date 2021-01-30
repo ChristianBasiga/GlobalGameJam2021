@@ -36,6 +36,13 @@ public class PlayerInventory : MonoBehaviour
         // Ideally loop through enumsbut fuck it.
     }
 
+
+
+    public bool HasAllItems()
+    {
+        return acquiredItems.Count.Equals(targetItemCount);
+    }
+
     public bool HasItem(RequiredItem.KeyItemType keyItemType)
     {
         return acquiredItems.Find((RequiredItem keyItem) =>

@@ -26,7 +26,7 @@ public class FlashLight : MonoBehaviour
     public void ToggleFlashlight()
     {
         lightComponent.enabled = !lightComponent.enabled;
-        // Play sound.
+        flashLightToggleSound.Play();
     }
 
 
@@ -36,7 +36,8 @@ public class FlashLight : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             this.ToggleFlashlight();
-        }   
+        }
+        // Follow on Y axis of camera.
     }
 
 
