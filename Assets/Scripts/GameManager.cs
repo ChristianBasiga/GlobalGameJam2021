@@ -59,6 +59,8 @@ public class GameManager : MonoBehaviour
     private void PlayerInventory_OnAcquiredItem(RequiredItem keyItem)
     {
         Debug.Log(keyItem.PickUpMessage);
+        // Really Game Manager should have ref to all icons and handle accordingly but easier like this.
+        keyItem.UpdateInventoryIcon();
         StartCoroutine(SetNotificationText(keyItem.PickUpMessage, Color.green));
 
     }

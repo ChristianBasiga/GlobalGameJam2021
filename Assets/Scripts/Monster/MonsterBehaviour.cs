@@ -15,6 +15,7 @@ public class MonsterBehaviour : MonoBehaviour
 
     // Variables for determining next target positon.
     Vector3 nextTargetPosition;
+    bool sawPlayerOnce = false;
     Vector3 directionLastSawPlayer;
     // May not be in exact direction.
     float directionOffset = 5;
@@ -94,10 +95,27 @@ public class MonsterBehaviour : MonoBehaviour
     {
         // Rotate around, then move in general direction last saw player?
         // This way stays pretty close to player always. Maybe do some rubber banding if gets too bar.
-        Vector3 direction = (directionLastSawPlayer - transform.position).normalized;
-        Quaternion lookRoation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRoation, Time.deltaTime * facingSpeed);
-        nextTargetPosition = direction * Time.deltaTime * speed;
+        if (sawPlayerOnce)
+        {
+            Debug.Log("I shouldn't happen yet");
+            Vector3 direction = (directionLastSawPlayer - transform.position).normalized;
+            Quaternion lookRoation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRoation, Time.deltaTime * facingSpeed);
+            nextTargetPosition = direction * Time.deltaTime * speed;
+        } else
+        {
+            // Default detection if not yet see player.
+            // Move in random spots in random direction.
+            // Randomly turn head.
+            Debug.Log("I happen ever?");
+            float angle = Random.RandomRange(-45, 45);
+            Quaternion lookRotation = Quaternion.Euler(0, 0, angle);
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
+            // Ideally it just walks in same direction fo awhile instead constantly turning, but can polish later.
+            // Prob use browing speed.
+            nextTargetPosition = transform.forward * Time.deltaTime * speed;
+        }
     }
 
     void LookForLight()
@@ -135,6 +153,7 @@ public class MonsterBehaviour : MonoBehaviour
     {
         if (monsterLineOfSight.playerInLineOfSight)
         {
+            sawPlayerOnce = true;
 
             // Look up RayCasting.
             RaycastHit hit;

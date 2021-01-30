@@ -6,7 +6,7 @@ public class ItemSuck : MonoBehaviour
     public PlayerInventory playerInventory;
     public float ItemSuckSpeed = 1.0f;
     public Transform SuckTransformTarget;
-    public float MinDistanceForSuck = 1.0f;
+    public float MinDistanceForSuck = 0.1f;
     // Start is called before the first frame update
     void Start()
     {
