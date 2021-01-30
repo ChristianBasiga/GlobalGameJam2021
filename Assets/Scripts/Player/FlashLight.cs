@@ -9,7 +9,7 @@ public class FlashLight : MonoBehaviour
 
     
     public Light lightComponent;
-
+    public AudioSource flashLightToggleSound;
 
     private void Awake()
     {
