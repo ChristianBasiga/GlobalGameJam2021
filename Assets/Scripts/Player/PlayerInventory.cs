@@ -28,10 +28,10 @@ public class PlayerInventory : MonoBehaviour
     // Called by player collider when collides with key item.
     public void AddToInventory(RequiredItem keyItem)
     {
-        if (!acquiredItems.Find((item) =>
+        if (acquiredItems.Find((item) =>
         {
-            return item.type.Equals(keyItem);
-        }))
+            return item.type.Equals(keyItem.type);
+        }) == null)
         {
             acquiredItems.Add(keyItem);
             OnAcquiredItem?.Invoke(keyItem);

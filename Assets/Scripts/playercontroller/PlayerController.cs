@@ -230,7 +230,8 @@ public class PlayerController : MonoBehaviour
     {
         if (hit.gameObject.CompareTag("Monster"))
         {
-            playerLoseSound.Play();
+            Debug.Log("I happen");
+            //playerLoseSound.Play();
             OnPlayerCaught?.Invoke();
            // hit.gameObject.SetActive(false);
         }

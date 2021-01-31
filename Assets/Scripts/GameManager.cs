@@ -16,9 +16,13 @@ public class GameManager : MonoBehaviour
     public AudioSource exitDoorMusic;
     public AudioSource MainMenuMusic;
 
+    
+
     //UI
     public GameObject gameOverPanel;
     public GameObject victoryPanel;
+
+    public GameObject sun;
 
     public float GameOverDelay;
     public float NotificationTime;
@@ -27,18 +31,15 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         notificationsText.text = "";
-        errorText.text = "";
         door.OnOpenDoor += Door_OnOpenDoor;
         playerInventory.OnAcquiredItem += PlayerInventory_OnAcquiredItem;
         playerInventory.OnAcquiredAllItems += PlayerInventory_OnAcquiredAllItems;
         playerController.OnPlayerCaught += PlayerController_OnPlayerCaught;
-        MainMenuMusic.Play();
     }
 
     public void StartGame()
     {
         MainMenuMusic.Stop();
-        introMusic.Play();
     }
 
     public void StopGame()
@@ -51,6 +52,7 @@ public class GameManager : MonoBehaviour
         // Victory Scene.
         // Sound plays
         victoryPanel.SetActive(true);
+        sun.SetActive(true);
     }
 
     private IEnumerator WinGame()
