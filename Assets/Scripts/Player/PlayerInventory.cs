@@ -28,11 +28,17 @@ public class PlayerInventory : MonoBehaviour
     // Called by player collider when collides with key item.
     public void AddToInventory(RequiredItem keyItem)
     {
-        acquiredItems.Add(keyItem);
-        OnAcquiredItem?.Invoke(keyItem);
-        if (acquiredItems.Count.Equals(targetItemCount))
+        if (!acquiredItems.Find((item) =>
         {
-            OnAcquiredAllItems?.Invoke();
+            return item.type.Equals(keyItem);
+        }))
+        {
+            acquiredItems.Add(keyItem);
+            OnAcquiredItem?.Invoke(keyItem);
+            if (acquiredItems.Count.Equals(targetItemCount))
+            {
+                OnAcquiredAllItems?.Invoke();
+            }
         }
         // Ideally loop through enumsbut fuck it.
     }

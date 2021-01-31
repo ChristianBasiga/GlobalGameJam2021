@@ -51,7 +51,6 @@ public class GameManager : MonoBehaviour
         // Victory Scene.
         // Sound plays
         victoryPanel.SetActive(true);
-        //exitDoorMusic.Play();
     }
 
     private IEnumerator WinGame()
