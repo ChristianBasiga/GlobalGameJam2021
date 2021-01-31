@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
                 runningSound.Stop();
                 if (!crouchWalkingSound.isPlaying)
                 {
-                    crouchWalkingSound.Stop();
+                    crouchWalkingSound.Play();
                 }
             } else if (!animatorStateInfo.IsName("Walk"))
             {
@@ -221,7 +221,6 @@ public class PlayerController : MonoBehaviour
         if (hit.gameObject.CompareTag("Monster"))
         {
             playerLoseSound.Play();
-            Debug.Log("heree");
             OnPlayerCaught?.Invoke();
            // hit.gameObject.SetActive(false);
         }
