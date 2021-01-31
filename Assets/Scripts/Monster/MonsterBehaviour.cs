@@ -13,6 +13,9 @@ public class MonsterBehaviour : MonoBehaviour
     [SerializeField]
     NavMeshAgent navMeshAgent;
 
+
+    public AudioSource MonsterWalk;
+
     public Animator monsterAnimator;
 
     // Variables for determining next target positon.
@@ -56,6 +59,7 @@ public class MonsterBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        MonsterWalk.Play();
         playerInventory.OnAcquiredItem += PlayerInventory_OnAcquiredItem;
         playerInventory.OnAcquiredAllItems += PlayerInventory_OnAcquiredAllItems;
         playerTransform.GetComponent<PlayerController>().OnPlayerCaught += MonsterBehaviour_OnPlayerCaught; ;
@@ -65,6 +69,7 @@ public class MonsterBehaviour : MonoBehaviour
 
     private void MonsterBehaviour_OnPlayerCaught()
     {
+        MonsterWalk.Stop();
         Debug.Log("Here");
         currentState = MonsterState.Scare;
         //navMeshAgent.gameObject.SetActive(false);
