@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
 
     public MonsterLineOfSight monsterLineOfSight;
     public PlayerInventory playerInventory;
+    // Add indicator behind.
 
     public event System.Action OnPlayerCaught;
     public event System.Action OnPlayerLookUpOrDown;
