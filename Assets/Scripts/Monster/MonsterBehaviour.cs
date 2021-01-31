@@ -13,6 +13,8 @@ public class MonsterBehaviour : MonoBehaviour
     [SerializeField]
     NavMeshAgent navMeshAgent;
 
+    public Animator monsterAnimator;
+
     // Variables for determining next target positon.
     Vector3 nextTargetPosition;
     bool sawPlayerOnce = false;
@@ -31,15 +33,19 @@ public class MonsterBehaviour : MonoBehaviour
     float walkPointRange = 20.0f;
     public MonsterLineOfSight monsterLineOfSight;
 
+    public bool isMoving;
+
     public Door door;
     public enum MonsterState
     {
         Idle,
         DetectingPlayer,
-        ChasingPlayer
+        ChasingPlayer,
+        Scare
     }
 
     public MonsterState currentState;
+    public AudioSource scareSound;
 
     float journeyStopPercentage;
 
@@ -48,13 +54,33 @@ public class MonsterBehaviour : MonoBehaviour
     {
         playerInventory.OnAcquiredItem += PlayerInventory_OnAcquiredItem;
         playerInventory.OnAcquiredAllItems += PlayerInventory_OnAcquiredAllItems;
+        playerTransform.GetComponent<PlayerController>().OnPlayerCaught += MonsterBehaviour_OnPlayerCaught; ;
         currentState = MonsterState.Idle;
         nextTargetPosition = possibleWaypoints[Random.Range(0, possibleWaypoints.Length)].position;
     }
 
+    private void MonsterBehaviour_OnPlayerCaught()
+    {
+        Debug.Log("Here");
+        currentState = MonsterState.Scare;
+        navMeshAgent.gameObject.SetActive(false);
+        monsterAnimator.SetTrigger("Scare");
+       // scareSound.Play();
+        // Set state in animator.
+    }
+
+    public IEnumerator FinishWinning()
+    {
+        yield return new WaitWhile(() =>
+        {
+            // And animation not done / state nor ight.
+            return scareSound.isPlaying;
+        });
+    }
+
+    
     private void PlayerInventory_OnAcquiredAllItems()
     {
-
     }
 
     private void PlayerInventory_OnAcquiredItem(RequiredItem obj)
@@ -73,8 +99,9 @@ public class MonsterBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (beganHunting)
+        if (beganHunting && !currentState.Equals(MonsterState.Scare))
         {
+
             if (currentState.Equals(MonsterState.DetectingPlayer))
             {
                 CheckIfPlayerOutOfVision();
@@ -98,14 +125,16 @@ public class MonsterBehaviour : MonoBehaviour
             Vector3 direction = (nextTargetPosition - transform.position).normalized;
             Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
+            monsterAnimator.SetTrigger("Walk");
         }
-        else
+        else if (!currentState.Equals(MonsterState.Scare))
         {
             DoNextWaypoint();
             navMeshAgent.SetDestination(nextTargetPosition);
             Vector3 direction = (nextTargetPosition - transform.position).normalized;
             Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
+            monsterAnimator.SetTrigger("Walk");
         }
     }
 

@@ -4,9 +4,10 @@ using UnityEngine;
 public class ItemSuck : MonoBehaviour
 {
     public PlayerInventory playerInventory;
-    public float ItemSuckSpeed = 1.0f;
+    public float ItemSuckSpeed = 1.1f;
     public Transform SuckTransformTarget;
-    public float MinDistanceForSuck = 0.1f;
+    float MinDistanceForSuck = Mathf.Epsilon;
+    bool sucking = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,11 +22,15 @@ public class ItemSuck : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        RequiredItem keyItem = other.GetComponent<RequiredItem>();
-        if (keyItem != null)
+        if (!sucking)
         {
-            // Then lerp the item towards the player.
-            StartCoroutine(SuckItem(keyItem));
+            RequiredItem keyItem = other.GetComponent<RequiredItem>();
+            if (keyItem != null)
+            {
+                sucking = true;
+                // Then lerp the item towards the player.
+                StartCoroutine(SuckItem(keyItem));
+            }
         }
     }
 
@@ -38,6 +43,6 @@ public class ItemSuck : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         playerInventory.AddToInventory(item);
-        item.gameObject.SetActive(false);
+        sucking = false;
     }
 }

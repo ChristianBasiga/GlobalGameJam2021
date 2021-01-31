@@ -4,19 +4,23 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
+    public MonsterBehaviour monster;
     public PlayerInventory playerInventory;
     public PlayerController playerController;
     public GameObject[] requiredItemsChecklist;
     public UnityEngine.UI.Text notificationsText;
     public UnityEngine.UI.Text errorText;
     public Door door;
-    // Something Ominous
+    public AudioSource pauseMusic;
     public AudioSource introMusic;
-    // Shining Light
     public AudioSource exitDoorMusic;
     public AudioSource MainMenuMusic;
 
+    //UI
+    public GameObject gameOverPanel;
+    public GameObject victoryPanel;
+
+    public float GameOverDelay;
     public float NotificationTime;
 
     // Start is called before the first frame update
@@ -39,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     public void StopGame()
     {
-
+        Application.Quit();
     }
 
     private void Door_OnOpenDoor()
@@ -47,33 +51,52 @@ public class GameManager : MonoBehaviour
         // Victory Scene.
         // Sound plays
         exitDoorMusic.Play();
+    }
 
+    private IEnumerator WinGame()
+    {
+        yield return playerController.FinishWinning();
+        // Do cut scene.
     }
 
     private void PlayerController_OnPlayerCaught()
     {
-
+        Debug.Log("I happen");
         StartCoroutine(OnGameOver());
     }
 
     private void PlayerInventory_OnAcquiredItem(RequiredItem keyItem)
     {
-        Debug.Log(keyItem.PickUpMessage);
-        // Really Game Manager should have ref to all icons and handle accordingly but easier like this.
         keyItem.UpdateInventoryIcon();
+        StartCoroutine(PlayItemPickUpSound(keyItem));
+       // keyItem.gameObject.SetActive(false);
         StartCoroutine(SetNotificationText(keyItem.PickUpMessage, Color.green));
-
     }
 
     private IEnumerator OnGameOver()
     {
-        errorText.text = "I have no Ikea how you lost";
-        errorText.color = Color.red;
-        yield return new WaitForSeconds(NotificationTime);
-        errorText.text = "";
+        Debug.Log("I happen");
+        // These should play same time.
+        // Actual actuions gets invoked separetely these IEnumerators simply pause game over till both are done.
+        //yield return playerController.FinishLosing();
+        //yield return monster.FinishWinning();
+        yield return new WaitForEndOfFrame();
+        gameOverPanel.SetActive(true);
         // Fade to black
+    }
 
-
+    private IEnumerator PlayItemPickUpSound(RequiredItem requiredItem)
+    {
+        AudioSource audioSource = requiredItem.GetComponent<AudioSource>();
+        if (audioSource != null)
+        {
+            audioSource.Play();
+            yield return new WaitWhile(() =>
+            {
+                return audioSource.isPlaying;
+            });
+        }
+        requiredItem.gameObject.SetActive(false);
     }
 
     private IEnumerator SetNotificationText(string message, Color color) 

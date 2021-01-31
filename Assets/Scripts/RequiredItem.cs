@@ -24,7 +24,8 @@ public class RequiredItem : MonoBehaviour
     void Start()
     {
 
-        inventoryIcon.sprite = null;
+        inventoryIcon.sprite = imageSrc;
+        inventoryIcon.color = new Color(inventoryIcon.color.r, inventoryIcon.color.b, inventoryIcon.color.g, 0.4f);
     }
 
     // Update is called once per frame
@@ -35,10 +36,6 @@ public class RequiredItem : MonoBehaviour
 
     public void UpdateInventoryIcon()
     {
-        if (this.type.Equals(KeyItemType.Lipstick))
-        {
-            inventoryIcon.GetComponent<RectTransform>().sizeDelta = new Vector2(100, 400);
-        }
-        this.inventoryIcon.sprite = imageSrc;
+        inventoryIcon.color = new Color(inventoryIcon.color.r, inventoryIcon.color.b, inventoryIcon.color.g, 1);
     }
 }
