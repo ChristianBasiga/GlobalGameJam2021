@@ -43,8 +43,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        UpdateCrouch();
         UpdateMouseLook();
         UpdateMovement();
+    }
+
+    void UpdateCrouch()
+    {
+
     }
 
     void UpdateMouseLook()
