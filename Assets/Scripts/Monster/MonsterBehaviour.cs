@@ -32,8 +32,12 @@ public class MonsterBehaviour : MonoBehaviour
     float facingSpeed = 5.0f;
     float walkPointRange = 20.0f;
     public MonsterLineOfSight monsterLineOfSight;
-
+    public float timeTillDetectAfterChase = 2.0f;
+    public float timeTillLeaveAfterHide = 2.0f;
     public bool isMoving;
+
+    public bool isWaiting;
+    public Vector3 lastPosition;
 
     public Door door;
     public enum MonsterState
@@ -63,7 +67,7 @@ public class MonsterBehaviour : MonoBehaviour
     {
         Debug.Log("Here");
         currentState = MonsterState.Scare;
-        navMeshAgent.gameObject.SetActive(false);
+        //navMeshAgent.gameObject.SetActive(false);
         monsterAnimator.SetTrigger("Scare");
        // scareSound.Play();
         // Set state in animator.
@@ -90,6 +94,7 @@ public class MonsterBehaviour : MonoBehaviour
             beganHunting = true;
             SetNextWaypoint();
             currentState = MonsterState.DetectingPlayer;
+            speed += 1.2f;
         } else
         {
             // Increase pace, be smarter idk.
@@ -99,44 +104,43 @@ public class MonsterBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (beganHunting && !currentState.Equals(MonsterState.Scare))
+        CheckIfPlayerOutOfVision();
+        if (currentState.Equals(MonsterState.DetectingPlayer))
         {
-
-            if (currentState.Equals(MonsterState.DetectingPlayer))
+            DoNextWaypoint();
+        }
+        else if (currentState.Equals(MonsterState.ChasingPlayer))
+        {
+            positionLastSawPlayer = playerTransform.position;
+            ChasePlayer();
+            /*
+            // Should pace around but its fine for now get it done.
+            if (!isWaiting)
             {
-                CheckIfPlayerOutOfVision();
-                DoNextWaypoint();
-            }
-            else if (currentState.Equals(MonsterState.ChasingPlayer))
-            {
-                if (!CheckIfPlayerOutOfVision())
+                if ((lastPosition - transform.position).magnitude < 0.001f)
+                {
+                    isWaiting = true;
+                    StartCoroutine(TryFindPlayer());
+                }
+                else
                 {
                     positionLastSawPlayer = playerTransform.position;
                     ChasePlayer();
                 }
-                else
-                {
-                    directionLastSawPlayer = (transform.position - playerTransform.position);
-                    // If out of vision, continue to last processed destination of player then continue detecting.
-                    currentState = MonsterState.DetectingPlayer;
-                }
-            }
-            navMeshAgent.SetDestination(nextTargetPosition);
-            Vector3 direction = (nextTargetPosition - transform.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
-            monsterAnimator.SetTrigger("Walk");
+            }*/
         }
         else if (!currentState.Equals(MonsterState.Scare))
         {
             DoNextWaypoint();
-            navMeshAgent.SetDestination(nextTargetPosition);
-            Vector3 direction = (nextTargetPosition - transform.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
-            monsterAnimator.SetTrigger("Walk");
         }
+        navMeshAgent.SetDestination(nextTargetPosition);
+        Vector3 direction = (nextTargetPosition - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
+        monsterAnimator.SetTrigger("Walk");
+        lastPosition = transform.position;
     }
+
 
     private void SetNextWaypoint()
     {
@@ -187,17 +191,29 @@ public class MonsterBehaviour : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRoation, Time.deltaTime * facingSpeed);
     }
 
-    bool CheckIfPlayerOutOfVision()
+    void CheckIfPlayerOutOfVision()
     {
         if (monsterLineOfSight.playerInLineOfSight)
         {
             currentState = MonsterState.ChasingPlayer;
-            return false;
 
-        } else
+        } else if (currentState != MonsterState.DetectingPlayer && !isWaiting)
         {
-            return true;
+            StartCoroutine(TryFindPlayer());
         }
-      
+    }
+
+    IEnumerator WaitAroundPlayer()
+    {
+        isWaiting = true;
+        yield return new WaitForSeconds(timeTillLeaveAfterHide);
+        currentState = MonsterState.DetectingPlayer;
+        isWaiting = false;
+    }
+
+    IEnumerator TryFindPlayer()
+    {
+        yield return new WaitForSeconds(timeTillDetectAfterChase);
+        currentState = MonsterState.DetectingPlayer;
     }
 }

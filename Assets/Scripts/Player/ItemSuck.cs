@@ -4,7 +4,7 @@ using UnityEngine;
 public class ItemSuck : MonoBehaviour
 {
     public PlayerInventory playerInventory;
-    float ItemSuckSpeed = 2f;
+    float ItemSuckSpeed = 3f;
     public Transform SuckTransformTarget;
     float MinDistanceForSuck = 0.001f;
     bool sucking = false;

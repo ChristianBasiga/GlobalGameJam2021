@@ -9,6 +9,7 @@ public class MonsterLineOfSight : MonoBehaviour
 {
     public Vector3 playerContactPoint;
     public bool playerInLineOfSight;
+    // Shoud keep chasing after out of sight until time liit.
     // Start is called before the first frame update
     void Start()
     {
@@ -23,9 +24,9 @@ public class MonsterLineOfSight : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-
         if (other.CompareTag("Player"))
         {
+            Debug.Log("Ever here");
             playerContactPoint = other.transform.position;
             playerInLineOfSight = true;
         }
@@ -35,6 +36,7 @@ public class MonsterLineOfSight : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            Debug.Log("Should keep happening");
             playerContactPoint = other.transform.position;
             playerInLineOfSight = true;
         }

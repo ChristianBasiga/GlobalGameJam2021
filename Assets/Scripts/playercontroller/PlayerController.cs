@@ -34,8 +34,8 @@ public class PlayerController : MonoBehaviour
     public float modelYCrouch = 0.3f;
     public Animator animator;
 
-    public float walkSpeed = 3.0f;
-    public float runSpeed = 6.0f;
+    public float walkSpeed = 2.0f;
+    public float runSpeed = 3.2f;
     public float crouchSpeed = 1.0f;
     public float moveSpeed;
     public bool isRunning = false;

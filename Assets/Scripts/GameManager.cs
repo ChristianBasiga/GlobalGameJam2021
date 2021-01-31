@@ -61,7 +61,6 @@ public class GameManager : MonoBehaviour
 
     private void PlayerController_OnPlayerCaught()
     {
-        Debug.Log("I happen");
         StartCoroutine(OnGameOver());
     }
 
@@ -75,7 +74,6 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator OnGameOver()
     {
-        Debug.Log("I happen");
         // These should play same time.
         // Actual actuions gets invoked separetely these IEnumerators simply pause game over till both are done.
         //yield return playerController.FinishLosing();
