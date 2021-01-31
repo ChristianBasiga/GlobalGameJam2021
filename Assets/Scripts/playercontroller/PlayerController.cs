@@ -144,9 +144,12 @@ public class PlayerController : MonoBehaviour
 
         if (targetDir.magnitude > 0)
         {
-            if (isRunning && !animatorStateInfo.IsName("Run"))
+            if (isRunning)
             {
-                animator.SetTrigger("Run");
+                if (!animatorStateInfo.IsName("Run"))
+                {
+                    animator.SetTrigger("Run");
+                }
                 walkingSound.Stop();
                 crouchWalkingSound.Stop();
                 if (!runningSound.isPlaying)
@@ -154,18 +157,24 @@ public class PlayerController : MonoBehaviour
                     runningSound.Play();
                 }
 
-            } else if (isCrouching && !animatorStateInfo.IsName("CrouchWalk"))
+            } else if (isCrouching)
             {
-                animator.SetTrigger("CrouchWalk");
+                if (!animatorStateInfo.IsName("CrouchWalk"))
+                {
+                    animator.SetTrigger("CrouchWalk");
+                }
                 walkingSound.Stop();
                 runningSound.Stop();
                 if (!crouchWalkingSound.isPlaying)
                 {
                     crouchWalkingSound.Play();
                 }
-            } else if (!animatorStateInfo.IsName("Walk"))
+            } else 
             {
-                animator.SetTrigger("Walk");
+                if (animatorStateInfo.IsName("Walk"))
+                {
+                    animator.SetTrigger("Walk");
+                }
                 crouchWalkingSound.Stop();
                 runningSound.Stop();
                 if (!walkingSound.isPlaying)
@@ -185,6 +194,8 @@ public class PlayerController : MonoBehaviour
                 animator.SetTrigger("Crouch");
             }
             walkingSound.Stop();
+            runningSound.Stop();
+            crouchWalkingSound.Stop();
         }
     }
 
@@ -217,7 +228,6 @@ public class PlayerController : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        //
         if (hit.gameObject.CompareTag("Monster"))
         {
             playerLoseSound.Play();

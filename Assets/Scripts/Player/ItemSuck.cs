@@ -4,9 +4,9 @@ using UnityEngine;
 public class ItemSuck : MonoBehaviour
 {
     public PlayerInventory playerInventory;
-    public float ItemSuckSpeed = 1.1f;
+    float ItemSuckSpeed = 2f;
     public Transform SuckTransformTarget;
-    float MinDistanceForSuck = Mathf.Epsilon;
+    float MinDistanceForSuck = 0.001f;
     bool sucking = false;
     // Start is called before the first frame update
     void Start()
