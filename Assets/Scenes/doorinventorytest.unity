@@ -246,6 +246,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  PickUpMessage: 
+  inventoryIcon: {fileID: 0}
+  imageSrc: {fileID: 0}
 --- !u!65 &397556305
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -317,6 +320,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 2
+  PickUpMessage: 
+  inventoryIcon: {fileID: 0}
+  imageSrc: {fileID: 0}
 --- !u!4 &745406161
 Transform:
   m_ObjectHideFlags: 0
@@ -381,6 +387,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
+  PickUpMessage: 
+  inventoryIcon: {fileID: 0}
+  imageSrc: {fileID: 0}
 --- !u!65 &1154696804
 BoxCollider:
   m_ObjectHideFlags: 0
