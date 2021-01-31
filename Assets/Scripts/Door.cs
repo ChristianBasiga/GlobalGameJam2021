@@ -6,6 +6,8 @@ public class Door : MonoBehaviour
 {
     public event System.Action OnOpenDoor;
 
+    public AudioSource doorlockedsound;
+
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +33,7 @@ public class Door : MonoBehaviour
                 OpenDoor();
             } else
             {
-
+                doorlockedsound.Play();
             }
         }
     }
