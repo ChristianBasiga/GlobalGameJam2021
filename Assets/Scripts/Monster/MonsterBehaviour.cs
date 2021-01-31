@@ -17,17 +17,21 @@ public class MonsterBehaviour : MonoBehaviour
     Vector3 nextTargetPosition;
     bool sawPlayerOnce = false;
     Vector3 directionLastSawPlayer;
+    Vector3 positionLastSawPlayer;
     // May not be in exact direction.
     float directionOffset = 5;
-
+    // So will layout set of possible way points, it will randomly pick waypoints with weight being how close waypoints is to player.
+    // Only truly random portion is the rotation.
+    public Transform[] possibleWaypoints;
     public bool beganHunting = false;
     public Transform playerTransform;
     public PlayerInventory playerInventory;
     float speed = 5.0f;
     float facingSpeed = 5.0f;
-
+    float walkPointRange = 20.0f;
     public MonsterLineOfSight monsterLineOfSight;
 
+    public Door door;
     public enum MonsterState
     {
         Idle,
@@ -37,13 +41,14 @@ public class MonsterBehaviour : MonoBehaviour
 
     public MonsterState currentState;
 
+    float journeyStopPercentage;
+
     // Start is called before the first frame update
     void Start()
     {
         playerInventory.OnAcquiredItem += PlayerInventory_OnAcquiredItem;
         playerInventory.OnAcquiredAllItems += PlayerInventory_OnAcquiredAllItems;
         //currentState = MonsterState.Idle;
-        nextTargetPosition = transform.position;
     }
 
     private void PlayerInventory_OnAcquiredAllItems()
@@ -56,6 +61,7 @@ public class MonsterBehaviour : MonoBehaviour
         if (!beganHunting)
         {
             beganHunting = true;
+            SetNextWaypoint();
             currentState = MonsterState.DetectingPlayer;
         } else
         {
@@ -77,6 +83,7 @@ public class MonsterBehaviour : MonoBehaviour
             {
                 if (!CheckIfPlayerOutOfVision())
                 {
+                    positionLastSawPlayer = playerTransform.position;
                     ChasePlayer();
                 } else
                 {
@@ -86,35 +93,96 @@ public class MonsterBehaviour : MonoBehaviour
                 }
             }
             navMeshAgent.SetDestination(nextTargetPosition);
+            Vector3 direction = (nextTargetPosition - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
         }
     }
 
-    // Detecting Player State Functions
-
-    void TryDetectPlayer()
+    private void SetNextWaypoint()
     {
-        // Rotate around, then move in general direction last saw player?
-        // This way stays pretty close to player always. Maybe do some rubber banding if gets too bar.
-        if (sawPlayerOnce)
+     //   int[] weights = CalculateWeights();
+     //  int weightedIndex = GetRandomWeightedIndex(weights);
+
+        List<Transform> sortedWaypoints = new List<Transform>(possibleWaypoints);
+
+        Vector3 positionToDiff;
+        sortedWaypoints.Sort((Transform t1, Transform t2) =>
         {
-            Debug.Log("I shouldn't happen yet");
-            Vector3 direction = (directionLastSawPlayer - transform.position).normalized;
-            Quaternion lookRoation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRoation, Time.deltaTime * facingSpeed);
-            nextTargetPosition = direction * Time.deltaTime * speed;
+            return (int)((t1.position - playerTransform.position).magnitude - (t2.position - playerTransform.position).magnitude);
+        });
+        // Not really weighted but restricting to top 5.
+        int weightedIndex;
+        // No matter what minimum is 2 options.
+        if (playerInventory.HasAllItems())
+        {
+            weightedIndex = Random.RandomRange(0, 1);
         } else
         {
-            // Default detection if not yet see player.
-            // Move in random spots in random direction.
-            // Randomly turn head.
-            Debug.Log("I happen ever?");
-            float angle = Random.RandomRange(-45, 45);
-            Quaternion lookRotation = Quaternion.Euler(0, 0, angle);
+           weightedIndex = Random.Range(0, sortedWaypoints.Count / 2 - playerInventory.ItemCount());
+        }
+        nextTargetPosition = sortedWaypoints[weightedIndex].position;
 
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * facingSpeed);
-            // Ideally it just walks in same direction fo awhile instead constantly turning, but can polish later.
-            // Prob use browing speed.
-            nextTargetPosition = transform.forward * Time.deltaTime * speed;
+    }
+
+    // Also offset weight by if saw player.
+    private int[] CalculateWeights()
+    {
+        // Target reached
+        // Choose new waypoint, weighted by nearest.
+        // Create weights based on nearest position
+        // Easier rather an actual weighting system. Sort distances, then random range first 5, elminating possbility for nearest.
+        int[] weights = new int[possibleWaypoints.Length];
+        ArrayList distances = new ArrayList(possibleWaypoints.Length);
+        for (int i = 0; i < possibleWaypoints.Length; ++i)
+        {
+            // Should have smallest distance be biggest weight
+            // so simply negate the weight.
+            float distance = Vector3.Distance(playerTransform.position, possibleWaypoints[i].position);
+            distances[i] = distance;
+            // Equal probablity in some but more probability towards the smaller ones.
+            //int weight = Mathf.Abs(-distance + Random.Range(distance / 2, distance));
+            //weights[i] = distance;
+        }
+        distances.Sort();
+
+        return weights;
+    }
+
+    private int GetRandomWeightedIndex(int[] weights)
+    {
+        // Get the total sum of all the weights.
+        int weightSum = 0;
+        for (int i = 0; i < weights.Length; ++i)
+        {
+            weightSum += weights[i];
+        }
+
+        // Step through all the possibilities, one by one, checking to see if each one is selected.
+        int index = 0;
+        int lastIndex = weights.Length - 1;
+        while (index < lastIndex)
+        {
+            // Do a probability check with a likelihood of weights[index] / weightSum.
+            if (Random.Range(0, weightSum) < weights[index])
+            {
+                return index;
+            }
+
+            // Remove the last item from the sum of total untested weights and try again.
+            weightSum -= weights[index++];
+        }
+
+        // No other item was selected, so return very last index.
+        return index;
+    }
+    void TryDetectPlayer()
+    {
+        // Could stop mid destination.
+        // If at destination already or if interrupt joruney early.
+        if (Vector3.Distance(transform.position, nextTargetPosition) <= navMeshAgent.stoppingDistance)
+        {
+            SetNextWaypoint();
         }
     }
 
@@ -153,25 +221,10 @@ public class MonsterBehaviour : MonoBehaviour
     {
         if (monsterLineOfSight.playerInLineOfSight)
         {
-            sawPlayerOnce = true;
-
-            // Look up RayCasting.
-            RaycastHit hit;
-            Vector3 castDirection = (monsterLineOfSight.playerContactPoint - transform.position).normalized;
             // Check if first thing in direct line of sight of monster is player, not super perfect cause just doesn't account for wide are
             // Check forward vector from offset angles.
             // No no, main thing is check trigger first.
             currentState = MonsterState.ChasingPlayer;
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 10, Color.red);
-            Debug.DrawRay(transform.position, castDirection * 100, Color.yellow);
-            if (Physics.Raycast(transform.position, castDirection, out hit, Mathf.Infinity))
-            {
-
-                Debug.Log("Ray cast hit" + hit.transform.name);
-                if (hit.transform.CompareTag("Player"))
-                {
-                }
-            }
             return false;
 
         } else

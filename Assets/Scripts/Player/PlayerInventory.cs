@@ -12,6 +12,7 @@ public class PlayerInventory : MonoBehaviour
     public event System.Action OnAcquiredAllItems;
     public event System.Action<RequiredItem> OnAcquiredItem;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +37,11 @@ public class PlayerInventory : MonoBehaviour
         // Ideally loop through enumsbut fuck it.
     }
 
+
+    public int ItemCount()
+    {
+        return acquiredItems.Count;
+    }
 
 
     public bool HasAllItems()
